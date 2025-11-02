@@ -6,6 +6,10 @@ test(matriz, [nondet]) :-
     matriz(2, 3, M),
     M =@= [[_, _, _], [_, _, _]].
 
+test(matriz, [nondet]) :-
+    matriz(1, 1, M),
+    M =@= [[_]].
+
 test(replicar, [nondet]) :-
     replicar(_, 0, R),
     R =@= [].

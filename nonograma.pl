@@ -1,8 +1,20 @@
 % Ejercicio 1
-matriz(F, C, M) :- completar("Ejercicio 1").
+matriz(F, C, M) :- append([], M, _), length(M, F), columnas(M, C).
+
+columnas([], C).
+columnas([H|T], C) :- length(H, C), columnas(T, C).
 
 % Ejercicio 2
-replicar(X, N, L) :- completar("Ejercicio 2").
+% Preguntar porque sucede el ; en la implementacion actual, 
+% vs la implementacion con funcion auxiliar.
+% replicar(X, N, L) :- append([], L, _), length(L, N), todosX(X, L).
+
+% todosX(_, []).
+% todosX(X, [X|T]) :- todosX(X, T).
+
+replicar(_, 0, []).
+replicar(X, N, [X|T]) :- 
+	append([], [X|T], _), S is N-1, length(T, S), replicar(X, S, T).
 
 % Ejercicio 3
 transponer(_, _) :- completar("Ejercicio 3").
