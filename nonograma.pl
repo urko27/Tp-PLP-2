@@ -12,12 +12,22 @@ columnas([H|T], C) :- length(H, C), columnas(T, C).
 % todosX(_, []).
 % todosX(X, [X|T]) :- todosX(X, T).
 
-replicar(_, 0, []).
-replicar(X, N, [X|T]) :- 
-	append([], [X|T], _), S is N-1, length(T, S), replicar(X, S, T).
+replicar(_, 0, []).  
+replicar(X, N, [X | T]) :- 
+	length([X | T], N),
+	M is N-1,
+	replicar(X, M, T).
 
 % Ejercicio 3
-transponer(_, _) :- completar("Ejercicio 3").
+%fila_a_columna(+M, -F, -R)
+fila_a_columna([], [], []).
+fila_a_columna([[HFila | TFila] | TMatriz], [HFila | Tcol], [TFila | TRes]) :- 
+	fila_a_columna(TMatriz, Tcol, TRes).
+
+transponer([[] | _], []).
+transponer(M, [H | T]) :-
+	fila_a_columna(M, H, Res),
+	transponer(Res, T).
 
 % Predicado dado armarNono/3
 armarNono(RF, RC, nono(M, RS)) :-
