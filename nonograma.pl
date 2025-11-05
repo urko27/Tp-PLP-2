@@ -44,7 +44,7 @@ zipR([R|RT], [L|LT], [r(R,L)|T]) :- zipR(RT, LT, T).
 
 % Ejercicio 4
 
-pintadasValidas(r([], L)).
+pintadasValidas(r([], L)) :- length(L, N), replicar(o, N, L).
 
 %Este caso base es necesario para no agregar el 'o' obligatorio despues de cada restricción.
 pintadasValidas(r([H], L)) :- 	length(L, N),
