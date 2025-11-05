@@ -43,7 +43,35 @@ zipR([], [], []).
 zipR([R|RT], [L|LT], [r(R,L)|T]) :- zipR(RT, LT, T).
 
 % Ejercicio 4
-pintadasValidas(_) :- completar("Ejercicio 4").
+
+pintadasValidas(r([], L)).
+
+%Este caso base es necesario para no agregar el 'o' obligatorio despues de cada restricción.
+pintadasValidas(r([H], L)) :- 	length(L, N),
+								N >= H,
+								replicar(x, H, Pintadas),								 
+								K is N - H, 
+								between(0, K, U), 
+								replicar(o, U, Anterior),
+								V is K - U,
+								replicar(o, V, Posterior),		 
+								append(Anterior, Pintadas, L1),
+								append(L1, Posterior, L).
+
+%Paso recursivo; agrega la restriccion H (tantas veces sea posible) y sobre el resto de la lista L hace BT aplicando el resto de las restricciones.
+pintadasValidas(r([H | T], L)) :- 									
+									length(L, N), 
+									N >= H + 1,
+									replicar(x, H, Pintadas),
+									append(Pintadas, [o], Medio),
+									K is N - H - 1, 
+									between(0, K, U), 
+									replicar(o, U, Anterior),									
+									V is K - U, 
+									length(Posterior, V),
+									pintadasValidas(r(T, Posterior)),
+									append(Anterior, Medio, L1),
+									append(L1, Posterior, L).
 
 % Ejercicio 5
 resolverNaive(_) :-  completar("Ejercicio 5").
