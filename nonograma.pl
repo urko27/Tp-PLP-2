@@ -74,7 +74,10 @@ pintadasValidas(r([H | T], L)) :-
 									append(L1, Posterior, L).
 
 % Ejercicio 5
-resolverNaive(_) :-  completar("Ejercicio 5").
+resolverNaive(nono(M, [])).
+resolverNaive(nono(M, [r(R, Fila) | RSS])) :- 
+								pintadasValidas(r(R, Fila)),
+								resolverNaive(nono(M, RSS)). 
 
 % Ejercicio 6
 pintarObligatorias(_) :- completar("Ejercicio 6").
