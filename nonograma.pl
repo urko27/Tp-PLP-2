@@ -97,7 +97,8 @@ combinarCelda(A, B, A) :- nonvar(A), nonvar(B), A = B.
 combinarCelda(A, B, _) :- nonvar(A), nonvar(B), A \== B.
 
 % Ejercicio 7
-deducir1Pasada(_) :- completar("Ejercicio 7").
+deducir1Pasada(nono(M, [])).
+deducir1Pasada(nono(M, [r(L, R) | RS])) :- length(L, N), pintarObligatorias(r(L, R)), deducir1Pasada(nono(M, RS)).
 
 % Predicado dado
 cantidadVariablesLibres(T, N) :- term_variables(T, LV), length(LV, N).
