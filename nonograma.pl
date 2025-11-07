@@ -80,7 +80,17 @@ resolverNaive(nono(M, [r(R, Fila) | RSS])) :-
 								resolverNaive(nono(M, RSS)). 
 
 % Ejercicio 6
-pintarObligatorias(_) :- completar("Ejercicio 6").
+pintarObligatorias(r(R, L)) :- 	setof(L, pintadasValidas(r(R, L)), C),
+								intersectar(C, L).
+							
+intersectar([A], A).
+intersectar([H, T | TS], S) :-  cruzar(H, T, G), intersectar([ G | TS], S).								
+
+cruzar([], [], []).
+cruzar([o | T1], [x | T2], [o | T]) :- cruzar(T1, T2, T).
+cruzar([x | T1], [o | T2], [o | T]) :- cruzar(T1, T2, T).
+cruzar([x | T1], [x | T2], [x | T]) :- cruzar(T1, T2, T).
+cruzar([o | T1], [o | T2], [o | T]) :- cruzar(T1, T2, T).
 
 % Predicado dado combinarCelda/3
 combinarCelda(A, B, _) :- var(A), var(B).
