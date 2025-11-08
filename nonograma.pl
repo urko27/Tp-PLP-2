@@ -1,7 +1,7 @@
 % Ejercicio 1
 matriz(F, C, M) :- append([], M, _), length(M, F), columnas(M, C).
 
-columnas([], C).
+columnas([], _).
 columnas([H|T], C) :- length(H, C), columnas(T, C).
 
 % Ejercicio 2
@@ -72,7 +72,7 @@ pintadasValidas(r([H | T], L)) :- 		length(L, N), length(T, Y), Y > 0,
 
 											
 % Ejercicio 5
-resolverNaive(nono(M, [])).
+resolverNaive(nono(_, [])).
 resolverNaive(nono(M, [r(R, Fila) | RSS])) :- 
 								pintadasValidas(r(R, Fila)),
 								resolverNaive(nono(M, RSS)). 
@@ -95,8 +95,8 @@ combinarCelda(A, B, A) :- nonvar(A), nonvar(B), A = B.
 combinarCelda(A, B, _) :- nonvar(A), nonvar(B), A \== B.
 
 % Ejercicio 7
-deducir1Pasada(nono(M, [])).
-deducir1Pasada(nono(M, [r(L, R) | RS])) :- length(L, N), pintarObligatorias(r(L, R)), deducir1Pasada(nono(M, RS)).
+deducir1Pasada(nono(_, [])).
+deducir1Pasada(nono(M, [r(L, R) | RS])) :- length(L, _), pintarObligatorias(r(L, R)), deducir1Pasada(nono(M, RS)).
 
 % Predicado dado
 cantidadVariablesLibres(T, N) :- term_variables(T, LV), length(LV, N).
@@ -114,21 +114,34 @@ deducirVariasPasadasCont(_, A, A). % Si VI = VF entonces no hubo más cambios y 
 deducirVariasPasadasCont(NN, A, B) :- A =\= B, deducirVariasPasadas(NN).
 
 % Ejercicio 8
-restriccionConMenosLibres(nono(M, RSS), r(RS1, R)) :-	
+restriccionConMenosLibres(nono(_, RSS), r(RS1, R)) :-	
 												member((r(RS1, R)), RSS),
 												cantidadVariablesLibres(R, CantMin),  
 												CantMin > 0, 
 												not((	
-														member((r(RS2, Restriccion)), RSS),
+														member((r(_, Restriccion)), RSS),
 														cantidadVariablesLibres(Restriccion, Cant), 
 														Cant > 0,
 														Cant < CantMin)).
 
 % Ejercicio 9
-resolverDeduciendo(NN) :- completar("Ejercicio 9").
+resolverDeduciendo(NN) :- deducirVariasPasadas(NN), resolverDeduciendoRec(NN).
+	%setof(NN, (deducirVariasPasadas(NN), resolverDeduciendoRec(NN)), Res).
+
+resolverDeduciendoRec(NN) :-	esSolucion(NN).
+
+resolverDeduciendoRec(NN) :-	not(esSolucion(NN)),
+								restriccionConMenosLibres(NN, R), ! ,
+								pintadasValidas(R),
+								resolverDeduciendo(NN).
+
+esSolucion(nono(_, [])).
+esSolucion(nono(M, [r(_, F) | T])) :- 	not((cantidadVariablesLibres(F, N), N > 0)), 
+										esSolucion(nono(M, T)).
+
 
 % Ejercicio 10
-solucionUnica(NN) :- completar("Ejercicio 10").
+solucionUnica(NN) :- findall(NN, resolverDeduciendo(NN), L), length(L, 1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                              %
