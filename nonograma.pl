@@ -14,7 +14,7 @@ columnas([H|T], C) :- length(H, C), columnas(T, C).
 
 replicar(_, 0, []).  
 replicar(X, N, [X | T]) :- 
-	length([X | T], N),
+	length([X | T], N), N > 0,
 	M is N-1,
 	replicar(X, M, T).
 
@@ -46,33 +46,31 @@ zipR([R|RT], [L|LT], [r(R,L)|T]) :- zipR(RT, LT, T).
 
 pintadasValidas(r([], L)) :- length(L, N), replicar(o, N, L).
 
-%Este caso base es necesario para no agregar el 'o' obligatorio despues de cada restricción.
 pintadasValidas(r([H], L)) :- 	length(L, N),
 								N >= H,
 								replicar(x, H, Pintadas),								 
-								K is N - H, 
+								K is N - H,
 								between(0, K, U), 
-								replicar(o, U, Anterior),
 								V is K - U,
-								replicar(o, V, Posterior),		 
+								replicar(o, U, Anterior),
+								replicar(o, V, Posterior),	
 								append(Anterior, Pintadas, L1),
 								append(L1, Posterior, L).
 
-%Paso recursivo; agrega la restriccion H (tantas veces sea posible) y sobre el resto de la lista L hace BT aplicando el resto de las restricciones.
-pintadasValidas(r([H | T], L)) :- 									
-									length(L, N), 
-									N >= H + 1,
-									replicar(x, H, Pintadas),
-									append(Pintadas, [o], Medio),
-									K is N - H - 1, 
-									between(0, K, U), 
-									replicar(o, U, Anterior),									
-									V is K - U, 
-									length(Posterior, V),
-									pintadasValidas(r(T, Posterior)),
-									append(Anterior, Medio, L1),
-									append(L1, Posterior, L).
+pintadasValidas(r([H | T], L)) :- 		length(L, N), length(T, Y), Y > 0,
+										N >= H + 1,
+										replicar(x, H, Pintadas),
+										append(Pintadas, [o], Medio),
+										K is N - H - 1, 
+										between(0, K, U), 
+										replicar(o, U, Anterior),
+										append(Anterior, Medio, L1),									
+										V is K - U, 
+										length(Posterior, V), 
+										pintadasValidas(r(T, Posterior)),
+										append(L1, Posterior, L).	
 
+											
 % Ejercicio 5
 resolverNaive(nono(M, [])).
 resolverNaive(nono(M, [r(R, Fila) | RSS])) :- 
@@ -116,7 +114,15 @@ deducirVariasPasadasCont(_, A, A). % Si VI = VF entonces no hubo más cambios y 
 deducirVariasPasadasCont(NN, A, B) :- A =\= B, deducirVariasPasadas(NN).
 
 % Ejercicio 8
-restriccionConMenosLibres(_, _) :- completar("Ejercicio 8").
+restriccionConMenosLibres(nono(M, RSS), r(RS1, R)) :-	
+												member((r(RS1, R)), RSS),
+												cantidadVariablesLibres(R, CantMin),  
+												CantMin > 0, 
+												not((	
+														member((r(RS2, Restriccion)), RSS),
+														cantidadVariablesLibres(Restriccion, Cant), 
+														Cant > 0,
+														Cant < CantMin)).
 
 % Ejercicio 9
 resolverDeduciendo(NN) :- completar("Ejercicio 9").
