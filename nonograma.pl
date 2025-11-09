@@ -13,8 +13,9 @@ columnas([H|T], C) :- length(H, C), columnas(T, C).
 % todosX(X, [X|T]) :- todosX(X, T).
 
 replicar(_, 0, []).  
-replicar(X, N, [X | T]) :- 
-	length([X | T], N), N > 0,
+replicar(X, N, [X | T]) :-
+	length([X | T], N),
+	N > 0,
 	M is N-1,
 	replicar(X, M, T).
 
@@ -96,7 +97,7 @@ combinarCelda(A, B, _) :- nonvar(A), nonvar(B), A \== B.
 
 % Ejercicio 7
 deducir1Pasada(nono(_, [])).
-deducir1Pasada(nono(M, [r(L, R) | RS])) :- length(L, _), pintarObligatorias(r(L, R)), deducir1Pasada(nono(M, RS)).
+deducir1Pasada(nono(M, [r(L, R) | RS])) :- pintarObligatorias(r(L, R)), deducir1Pasada(nono(M, RS)).
 
 % Predicado dado
 cantidadVariablesLibres(T, N) :- term_variables(T, LV), length(LV, N).
