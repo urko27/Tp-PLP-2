@@ -226,3 +226,5 @@ mostrarCelda(C) :- var(C), write('¿?').
 % Predicados auxiliares para analisis.
 tam(N, (F, C)) :- nn(N, nono(M, _)), matriz(F, C, M).
 tamanios(N, (F, C)) :- between(0, 14, N), tam(N, (F, C)).
+solucionesUnicas(N) :- between(0, 14, N), nn(N, NN), solucionUnica(NN).
+deduciblesSinBacktrack(N) :- between(0, 14, N), nn(N, NN), resolverDeduciendo(NN).

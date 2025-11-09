@@ -1,16 +1,16 @@
 N,Tamaño,SolucionUnica,Deducible sin backtracking
-0,2x3,SI,SI
-1,5x5,SI,SI
-2,5x5,SI,SI
-3,10x10,SI,SI
-4,5x5,SI,SI
-5,5x5,SI,SI
-6,5x5,SI,SI
-7,10x10,SI,SI
-8,10x10,SI,SI
-9,5x5,SI,SI
-10,5x5,NO,SI
-11,10x10,SI,NO
-12,15x15,SI,SI
-13,11x5,SI,SI
-14,4x4,SI,SI
+0,  2x3,      SI, SI
+1,  5x5,      SI, SI
+2,  5x5,      SI, SI
+3,  10x10,    SI, SI
+4,  5x5,      SI, SI
+5,  5x5,      SI, SI
+6,  5x5,      SI, SI
+7,  10x10,    SI, SI
+8,  10x10,    SI, SI
+9,  5x5,      SI, SI
+10, 5x5,      NO, SI
+11, 10x10,    SI, SI
+12, 15x15,    SI, SI
+13, 11x5,     SI, SI
+14, 4x4,      SI, SI
