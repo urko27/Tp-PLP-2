@@ -222,3 +222,7 @@ mostrarFila(Fila) :-
 mostrarCelda(C) :- nonvar(C), C = x, write('██').
 mostrarCelda(C) :- nonvar(C), C = o, write('░░').
 mostrarCelda(C) :- var(C), write('¿?').
+
+% Predicados auxiliares para analisis.
+tam(N, (F, C)) :- nn(N, nono(M, _)), matriz(F, C, M).
+tamanios(N, (F, C)) :- between(0, 14, N), tam(N, (F, C)).
