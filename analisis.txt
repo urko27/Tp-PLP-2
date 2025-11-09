@@ -10,7 +10,7 @@ N,Tamaño,SolucionUnica,Deducible sin backtracking
 8,10x10,SI,SI
 9,5x5,SI,SI
 10,5x5,NO,SI
-11,10x10,SI,SI
+11,10x10,SI,NO
 12,15x15,SI,SI
 13,11x5,SI,SI
 14,4x4,SI,SI
