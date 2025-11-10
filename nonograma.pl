@@ -227,4 +227,10 @@ mostrarCelda(C) :- var(C), write('¿?').
 tam(N, (F, C)) :- nn(N, nono(M, _)), matriz(F, C, M).
 tamanios(N, (F, C)) :- between(0, 14, N), tam(N, (F, C)).
 solucionesUnicas(N) :- between(0, 14, N), nn(N, NN), solucionUnica(NN).
-deduciblesSinBacktrack(N) :- between(0, 14, N), nn(N, NN), resolverDeduciendo(NN).
+
+casillerosInstanciados([]).
+casillerosInstanciados([H | T]) :- nonvar(H), casillerosInstanciados(T).
+
+todasInstanciadas([]).
+todasInstanciadas([H | T]) :- casillerosInstanciados(H), todasInstanciadas(T).
+deduciblesSinBacktrack(N) :- between(0, 14, N), nn(N, NN), deducirVariasPasadas(NN), NN = nono(M,_), todasInstanciadas(M).
