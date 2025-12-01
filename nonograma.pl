@@ -42,7 +42,7 @@ zipR([R|RT], [L|LT], [r(R,L)|T]) :- zipR(RT, LT, T).
 
 pintadasValidas(r([], L)) :- length(L, N), replicar(o, N, L).
 
-pintadasValidas(r([H], L)) :- 	length(L, N),
+pintadasValidas(r([H], L)) :- length(L, N),
 								N >= H,
 								replicar(x, H, Pintadas),								 
 								K is N - H,
@@ -53,7 +53,7 @@ pintadasValidas(r([H], L)) :- 	length(L, N),
 								append(Anterior, Pintadas, L1),
 								append(L1, Posterior, L).
 
-pintadasValidas(r([H | T], L)) :- 		length(L, N), length(T, Y), Y > 0,
+pintadasValidas(r([H | T], L)) :- length(L, N), length(T, Y), Y > 0,
 										N >= H + 1,
 										replicar(x, H, Pintadas),
 										append(Pintadas, [o], Medio),
@@ -67,25 +67,19 @@ pintadasValidas(r([H | T], L)) :- 		length(L, N), length(T, Y), Y > 0,
 										append(L1, Posterior, L).	
 
 											
-% Ejercicio 5
-resolverNaive(nono(_, [])).
-resolverNaive(nono(M, [r(R, Fila) | RSS])) :- 
-								pintadasValidas(r(R, Fila)),
-								resolverNaive(nono(M, RSS)). 
+% Ejercicio 5 
+resolverNaive(nono(_, RSS)) :- maplist(pintadasValidas, RSS).
 
 % Ejercicio 6
+% Se genera el predicado auxiliar intersecar/2 para ir armando la fila/columna con las pintadas que están en todas las posibles soluciones válidas.
+pintarObligatorias(r(R, L)) :- setof(L, pintadasValidas(r(R, L)), C), intersecarVariasListas(C, L).
 
-% Se genera el predicado auxiliar intersectar/2 para ir armando la fila/columna con las pintadas que están en todas las posibles soluciones válidas.
-pintarObligatorias(r(R, L)) :- 	setof(L, pintadasValidas(r(R, L)), C),
-								intersectarVarias(C, L).
+intersecarVariasListas([A], A).
+intersecarVariasListas([H, T | TS], S) :- 
+	intersecarDosListas(H, T, G), intersecarVariasListas([G | TS], S).								
 
-% IntersectarVarias/2 va generando la intersección dos a dos de las listas candidatas, hasta que, en el caso base queda una única lista, que es el resultado.
-intersectarVariasListas([A], A).
-intersectarVariasListas([H, T | TS], S) :-  intersectarDosListas(H, T, G), intersectarVariasListas([ G | TS], S).								
-
-% IntersectarDos/3 hace una intersección en un par de listas. 
-intersectarDosListas([], [], []).
-intersectarDosListas([X | T1], [Y | T2], [Z | T]) :- combinarCelda(X, Y, Z), intersectarDosListas(T1, T2, T).
+% IntersecarDos/3 hace una intersección en un par de listas. 
+intersecarDosListas(L1, L2, LS) :- maplist(combinarCelda, L1, L2, LS).
 
 % Predicado dado combinarCelda/3
 combinarCelda(A, B, _) :- var(A), var(B).
@@ -95,8 +89,7 @@ combinarCelda(A, B, A) :- nonvar(A), nonvar(B), A = B.
 combinarCelda(A, B, _) :- nonvar(A), nonvar(B), A \== B.
 
 % Ejercicio 7
-deducir1Pasada(nono(_, [])).
-deducir1Pasada(nono(M, [r(L, R) | RS])) :- pintarObligatorias(r(L, R)), deducir1Pasada(nono(M, RS)).
+deducir1Pasada(nono(_, RSS)) :- maplist(pintarObligatorias, RSS).
 
 % Predicado dado
 cantidadVariablesLibres(T, N) :- term_variables(T, LV), length(LV, N).
