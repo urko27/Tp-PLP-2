@@ -1,23 +1,13 @@
 % Ejercicio 1
-matriz(F, C, M) :- append([], M, _), length(M, F), columnas(M, C).
+matriz(F, C, M) :- length(M, F), columnas(M, C).
+columnas(M, C) :- maplist(length_c(C), M).
 
-columnas([], _).
-columnas([H|T], C) :- length(H, C), columnas(T, C).
+length_c(C, Fila) :- length(Fila, C).
 
 % Ejercicio 2
-% Preguntar porque sucede el ; en la implementacion actual, 
-% vs la implementacion con funcion auxiliar.
-% replicar(X, N, L) :- append([], L, _), length(L, N), todosX(X, L).
-
-% todosX(_, []).
-% todosX(X, [X|T]) :- todosX(X, T).
-
-replicar(_, 0, []).  
-replicar(X, N, [X | T]) :-
-	length([X | T], N),
-	N > 0,
-	M is N-1,
-	replicar(X, M, T).
+replicar(X, N, L) :-
+	length(L, N),
+	maplist(=(X), L).
 
 % Ejercicio 3
 %fila_a_columna(+M, -F, -R)
