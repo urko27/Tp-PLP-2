@@ -124,23 +124,22 @@ cantidadLibresNoNulas(r(RS1, R), RSS, C) :-
 % Se utiliza el cut para no generar multiples soluciones iguales. por ejemplo, sin el cut puesto ahí, generaba 6457 soluciones para el nonograma que debía devolver tan sólo 36 soluciones. 
 resolverDeduciendo(NN) :- deducirVariasPasadas(NN), resolverDeduciendoRec(NN).
 
-resolverDeduciendoRec(NN) :-	esSolucion(NN).
-
-resolverDeduciendoRec(NN) :-	not(esSolucion(NN)),
+resolverDeduciendoRec(NN) :- esSolucion(NN).
+resolverDeduciendoRec(NN) :- not(esSolucion(NN)),
 								restriccionConMenosLibres(NN, R), ! ,
 								pintadasValidas(R),
 								resolverDeduciendo(NN).
 
 
 % es Solucion cuando no tiene variables libres, es decir, todas las celdas de la matriz estan asignadas.
-esSolucion(nono(_, [])).
-esSolucion(nono(M, [r(_, F) | T])) :- 	not((cantidadVariablesLibres(F, N), N > 0)), 
-										esSolucion(nono(M, T)).
-
+esSolucion(nono(_, RSS)) :- 
+    maplist(sinVariablesLibres, RSS).
+sinVariablesLibres(r(_, F)) :- 
+    cantidadVariablesLibres(F, 0).
 
 % Ejercicio 10
 
-% Directo. Es encontrar todas las posibles, y ver que haya sólo una.
+% Encontramos todas las soluciones posibles, y verificamos que haya una sola.
 solucionUnica(NN) :- findall(NN, resolverDeduciendo(NN), L), length(L, 1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
