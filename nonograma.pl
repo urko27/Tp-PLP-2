@@ -76,7 +76,7 @@ pintarObligatorias(r(R, L)) :- setof(L, pintadasValidas(r(R, L)), C), intersecar
 
 intersecarVariasListas([A], A).
 intersecarVariasListas([H, T | TS], S) :- 
-	intersecarDosListas(H, T, G), intersecarVariasListas([G | TS], S).								
+	intersecarDosListas(H, T, G), intersecarVariasListas([G | TS], S).
 
 % IntersecarDos/3 hace una intersección en un par de listas. 
 intersecarDosListas(L1, L2, LS) :- maplist(combinarCelda, L1, L2, LS).
@@ -107,20 +107,19 @@ deducirVariasPasadasCont(_, A, A). % Si VI = VF entonces no hubo más cambios y 
 deducirVariasPasadasCont(NN, A, B) :- A =\= B, deducirVariasPasadas(NN).
 
 % Ejercicio 8
-
-%Como sugerencia de la cátedra y por lo visto en clase, se utiliza el not para usar el "no existe" otra restriccón con una cantidad menor a la mínima de variables librs.
 restriccionConMenosLibres(nono(_, RSS), r(RS1, R)) :-	
-												member((r(RS1, R)), RSS),
-												cantidadVariablesLibres(R, CantMin),  
-												CantMin > 0, 
-												not((	
-														member((r(_, Restriccion)), RSS),
-														cantidadVariablesLibres(Restriccion, Cant), 
-														Cant > 0,
-														Cant < CantMin)).
+												cantidadLibresNoNulas(r(RS1, R), RSS, CMin),
+												not((
+													cantidadLibresNoNulas((r(_, _)), RSS, C), 
+													C < CMin
+												)).
 
-% Ejercicio 9}
+cantidadLibresNoNulas(r(RS1, R), RSS, C) :- 
+	member((r(RS1, R)), RSS), 
+	cantidadVariablesLibres(R, C), 
+	C > 0.
 
+% Ejercicio 9
 % Aca aplicamos recursión y el predicado not para armar clausulas disjuntas con el "esSolucion", en este caso, corta la búsqueda y si, no es solución continúa backtrackeando. 
 % Se utiliza el cut para no generar multiples soluciones iguales. por ejemplo, sin el cut puesto ahí, generaba 6457 soluciones para el nonograma que debía devolver tan sólo 36 soluciones. 
 resolverDeduciendo(NN) :- deducirVariasPasadas(NN), resolverDeduciendoRec(NN).
