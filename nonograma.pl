@@ -35,6 +35,11 @@ zipR([R|RT], [L|LT], [r(R,L)|T]) :- zipR(RT, LT, T).
 
 % Ejercicio 4
 
+% Caso Base: No hay celdas para pintar, se completan indefectiblemente con 'o'
+% Caso recursivo con una única resitrccion: Se diferencia del segundo caso recursivo en que no hay que obligatoriamente completar con una 'o' al final.
+% Caso recursivo con mas de una restricción: Se asigna una 'o' luego de cada bloque de pintadas para separar y hacer el backtracking luego. 
+% Con el length de la cola mayor a 0 aseguramos mas de una restricción.
+
 pintadasValidas(r([], L)) :- length(L, N), replicar(o, N, L).
 
 pintadasValidas(r([H], L)) :- 	length(L, N),
@@ -69,14 +74,18 @@ resolverNaive(nono(M, [r(R, Fila) | RSS])) :-
 								resolverNaive(nono(M, RSS)). 
 
 % Ejercicio 6
-pintarObligatorias(r(R, L)) :- 	setof(L, pintadasValidas(r(R, L)), C),
-								intersectar(C, L).
-							
-intersectar([A], A).
-intersectar([H, T | TS], S) :-  cruzar(H, T, G), intersectar([ G | TS], S).								
 
-cruzar([], [], []).
-cruzar([X | T1], [Y | T2], [Z | T]) :- combinarCelda(X, Y, Z), cruzar(T1, T2, T).
+% Se genera el predicado auxiliar intersectar/2 para ir armando la fila/columna con las pintadas que están en todas las posibles soluciones válidas.
+pintarObligatorias(r(R, L)) :- 	setof(L, pintadasValidas(r(R, L)), C),
+								intersectarVarias(C, L).
+
+% IntersectarVarias/2 va generando la intersección dos a dos de las listas candidatas, hasta que, en el caso base queda una única lista, que es el resultado.
+intersectarVariasListas([A], A).
+intersectarVariasListas([H, T | TS], S) :-  intersectarDosListas(H, T, G), intersectarVariasListas([ G | TS], S).								
+
+% IntersectarDos/3 hace una intersección en un par de listas. 
+intersectarDosListas([], [], []).
+intersectarDosListas([X | T1], [Y | T2], [Z | T]) :- combinarCelda(X, Y, Z), intersectarDosListas(T1, T2, T).
 
 % Predicado dado combinarCelda/3
 combinarCelda(A, B, _) :- var(A), var(B).
@@ -105,6 +114,8 @@ deducirVariasPasadasCont(_, A, A). % Si VI = VF entonces no hubo más cambios y 
 deducirVariasPasadasCont(NN, A, B) :- A =\= B, deducirVariasPasadas(NN).
 
 % Ejercicio 8
+
+%Como sugerencia de la cátedra y por lo visto en clase, se utiliza el not para usar el "no existe" otra restriccón con una cantidad menor a la mínima de variables librs.
 restriccionConMenosLibres(nono(_, RSS), r(RS1, R)) :-	
 												member((r(RS1, R)), RSS),
 												cantidadVariablesLibres(R, CantMin),  
@@ -115,9 +126,11 @@ restriccionConMenosLibres(nono(_, RSS), r(RS1, R)) :-
 														Cant > 0,
 														Cant < CantMin)).
 
-% Ejercicio 9
+% Ejercicio 9}
+
+% Aca aplicamos recursión y el predicado not para armar clausulas disjuntas con el "esSolucion", en este caso, corta la búsqueda y si, no es solución continúa backtrackeando. 
+% Se utiliza el cut para no generar multiples soluciones iguales. por ejemplo, sin el cut puesto ahí, generaba 6457 soluciones para el nonograma que debía devolver tan sólo 36 soluciones. 
 resolverDeduciendo(NN) :- deducirVariasPasadas(NN), resolverDeduciendoRec(NN).
-	%setof(NN, (deducirVariasPasadas(NN), resolverDeduciendoRec(NN)), Res).
 
 resolverDeduciendoRec(NN) :-	esSolucion(NN).
 
@@ -126,12 +139,16 @@ resolverDeduciendoRec(NN) :-	not(esSolucion(NN)),
 								pintadasValidas(R),
 								resolverDeduciendo(NN).
 
+
+% es Solucion cuando no tiene variables libres, es decir, todas las celdas de la matriz estan asignadas.
 esSolucion(nono(_, [])).
 esSolucion(nono(M, [r(_, F) | T])) :- 	not((cantidadVariablesLibres(F, N), N > 0)), 
 										esSolucion(nono(M, T)).
 
 
 % Ejercicio 10
+
+% Directo. Es encontrar todas las posibles, y ver que haya sólo una.
 solucionUnica(NN) :- findall(NN, resolverDeduciendo(NN), L), length(L, 1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
