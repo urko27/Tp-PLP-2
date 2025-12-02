@@ -40,33 +40,55 @@ zipR([R|RT], [L|LT], [r(R,L)|T]) :- zipR(RT, LT, T).
 % Caso recursivo con mas de una restricción: Se asigna una 'o' luego de cada bloque de pintadas para separar y hacer el backtracking luego. 
 % Con el length de la cola mayor a 0 aseguramos mas de una restricción.
 
-pintadasValidas(r([], L)) :- length(L, N), replicar(o, N, L).
+% pintadasValidas(r([], L)) :- length(L, N), replicar(o, N, L).
+% pintadasValidas(r([H], L)) :- length(L, N),
+% 								N >= H,
+% 								replicar(x, H, Pintadas),								 
+% 								K is N - H,
+% 								between(0, K, U), 
+% 								V is K - U,
+% 								replicar(o, U, Anterior),
+% 								replicar(o, V, Posterior),	
+% 								append(Anterior, Pintadas, L1),
+% 								append(L1, Posterior, L).
+% pintadasValidas(r([H | T], L)) :- length(L, N), length(T, Y), Y > 0,
+% 										N >= H + 1,
+% 										replicar(x, H, Pintadas),
+% 										append(Pintadas, [o], Medio),
+% 										K is N - H - 1, 
+% 										between(0, K, U), 
+% 										replicar(o, U, Anterior),
+% 										append(Anterior, Medio, L1),									
+% 										V is K - U, 
+% 										length(Posterior, V), 
+% 										pintadasValidas(r(T, Posterior)),
+% 										append(L1, Posterior, L).	
 
-pintadasValidas(r([H], L)) :- length(L, N),
-								N >= H,
-								replicar(x, H, Pintadas),								 
-								K is N - H,
-								between(0, K, U), 
-								V is K - U,
-								replicar(o, U, Anterior),
-								replicar(o, V, Posterior),	
-								append(Anterior, Pintadas, L1),
-								append(L1, Posterior, L).
+pintadasValidas(r([], L)) :- dejarVacio(L).
+pintadasValidas(r([R|RS], L)) :-
+	length(L, N),
+	between(0, N, Y),
+	pintadasRec(r([R|RS], L), Y).
 
-pintadasValidas(r([H | T], L)) :- length(L, N), length(T, Y), Y > 0,
-										N >= H + 1,
-										replicar(x, H, Pintadas),
-										append(Pintadas, [o], Medio),
-										K is N - H - 1, 
-										between(0, K, U), 
-										replicar(o, U, Anterior),
-										append(Anterior, Medio, L1),									
-										V is K - U, 
-										length(Posterior, V), 
-										pintadasValidas(r(T, Posterior)),
-										append(L1, Posterior, L).	
+pintadasRec(r([], L), _) :- dejarVacio(L).
+pintadasRec(r([R], L), SP) :- 
+	pintarRestriccion(R, L, SP, Ultimas),
+	pintadasRec(r([], Ultimas), _).
+pintadasRec(r([R|[RH|RT]], L), SP) :-
+	pintarRestriccion(R, L, SP, Ultimas),
+	length(Ultimas, Resto),
+	between(1, Resto, Y),
+	pintadasRec(r([RH|RT], Ultimas), Y).
 
-											
+pintarRestriccion(R, L, SP, Ultimas) :-
+	length(L, N), R =< N,
+	replicar(o, SP, NoPintadas),
+	replicar(x, R, Pintadas),
+	append(NoPintadas, Pintadas, Primeras),
+	append(Primeras, Ultimas, L).
+
+dejarVacio(L) :- length(L, N), replicar(o, N, L).
+
 % Ejercicio 5 
 resolverNaive(nono(_, RSS)) :- maplist(pintadasValidas, RSS).
 
