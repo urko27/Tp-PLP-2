@@ -40,6 +40,7 @@ zipR([R|RT], [L|LT], [r(R,L)|T]) :- zipR(RT, LT, T).
 % Caso recursivo con mas de una restricción: Se asigna una 'o' luego de cada bloque de pintadas para separar y hacer el backtracking luego. 
 % Con el length de la cola mayor a 0 aseguramos mas de una restricción.
 
+% APPROACH 1
 % pintadasValidas(r([], L)) :- length(L, N), replicar(o, N, L).
 % pintadasValidas(r([H], L)) :- length(L, N),
 % 								N >= H,
@@ -63,7 +64,29 @@ zipR([R|RT], [L|LT], [r(R,L)|T]) :- zipR(RT, LT, T).
 % 										length(Posterior, V), 
 % 										pintadasValidas(r(T, Posterior)),
 % 										append(L1, Posterior, L).	
+% APPROACH 1
 
+% APPROACH PRIME
+pintadasValidas(r(Restricciones, L)) :- resolver(Restricciones, L).
+
+resolver([], L) :- dejarVacio(L).
+resolver([R|Rs], [o|Resto]) :- resolver([R|Rs], Resto).
+resolver([R|Rs], L) :-
+    pintarRestriccion(R, L, Resto), agregarSinPintar(Rs, Resto).
+
+pintarRestriccion(0, L, L).
+pintarRestriccion(N, [x|T], Resto) :- 
+    N > 0, N1 is N - 1, 
+    pintarRestriccion(N1, T, Resto).
+
+agregarSinPintar([], L) :- dejarVacio(L).
+agregarSinPintar([R|Rs], [o|Resto]) :- resolver([R|Rs], Resto).
+
+dejarVacio([]).
+dejarVacio([o|T]) :- dejarVacio(T).
+% APPROACH PRIME
+
+% APPROACH 2
 pintadasValidas(r([], L)) :- dejarVacio(L).
 pintadasValidas(r([R|RS], L)) :-
 	length(L, N),
@@ -71,12 +94,9 @@ pintadasValidas(r([R|RS], L)) :-
 	pintadasRec(r([R|RS], L), Y).
 
 pintadasRec(r([], L), _) :- dejarVacio(L).
-pintadasRec(r([R], L), SP) :- 
-	pintarRestriccion(R, L, SP, Ultimas),
-	pintadasRec(r([], Ultimas), _).
-pintadasRec(r([R|[RH|RT]], L), SP) :-
-	pintarRestriccion(R, L, SP, Ultimas),
-	length(Ultimas, Resto),
+pintadasRec(r([R], L), SP) :- pintarRestriccion(R, L, SP, Ultimas), pintadasRec(r([], Ultimas), _).
+pintadasRec(r([R|[RH|RT]], L), SP) :- pintarRestriccion(R, L, SP, Ultimas), 
+	length(Ultimas, Resto), 
 	between(1, Resto, Y),
 	pintadasRec(r([RH|RT], Ultimas), Y).
 
@@ -88,6 +108,7 @@ pintarRestriccion(R, L, SP, Ultimas) :-
 	append(Primeras, Ultimas, L).
 
 dejarVacio(L) :- length(L, N), replicar(o, N, L).
+% APPROACH 2
 
 % Ejercicio 5 
 resolverNaive(nono(_, RSS)) :- maplist(pintadasValidas, RSS).
