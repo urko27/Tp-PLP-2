@@ -4,8 +4,6 @@ Indicar si el predicado replicar/3 es reversible en el segundo argumento. En con
 replicar(+Elem,-N,-Lista) funciona correctamente.
 
 ---
----
-
 ## Respuesta:
 
 Partamos de la funcionalidad de replicar/3 dada por consigna:
@@ -26,33 +24,12 @@ Luego, si replicar/3 fuera reversible en el segundo argumento entonces este pred
 Ahora bien, presentemos nuestra definición de replicar/3:
 
 ```prolog
-replicar(_, 0, []).  
-replicar(X, N, [X | T]) :- 
-	length([X | T], N), 
-    N > 0,
-	M is N-1,
-	replicar(X, M, T).
+replicar(X, N, L) :-
+	length(L, N),
+	maplist(=(X), L).
 ```
 
-Analicemos la reversibilidad del segundo argumento (N), en el caso en que este viene instanciado y en el caso en que no:
-
-- ### **N está instanciada:** 
-
-    Si N está instanciada entonces replicar/3 debe cumplir que instancie en L la lista de tamaño N donde todos sus elementos son Elem.
-
-    En nuestra definición de replicar/3 forzamos que el tamaño de la lista L (tratada como [X | T] aprovechando la unificación nativa de prolog para que nuestra lista L contenga al elemento Elem como cabeza) sea igual al tamaño del N instanciado por la definición de length/2, luego verificamos que N no era negativo usando el operador '>' (lo cual es válido porque N estaba instanciado), luego realizamos una asignación
-    ```prolog
-    M is N-1,
-    ```
-    que es válida porque -nuevamente- N estaba instanciado, y finalmente hacemos un llamado recursivo con: el elemento que queremos en cada posición, el M instanciado y la cola de la lista que queremos instanciar; esto va a hacer un llamado recursivo sobre la cola de lista donde habrá nuevamente un segundo argumento instanciado y donde (por la unificación nativa de prolog) el primer elemento de la cola de L deberá ser Elem; paulatinamente prolog logrará unificar a L con
-    ```prolog
-    replicar(_, 0, []).
-    ```
-    (pues siempre decrementamos al largo de lista) y se construirá (gracias a la serie de unificaciones realizadas de forma nativa) la lista de largo N (refiriendonos al N dado antes de cualquier recursión) donde todos sus elementos son Elem.
-    
-    #### Conclusión 1: la definición de replicar/3 para N instanciado **no falla**.
-
-    #### Conclusión 2: la definición de replicar/3 para N instanciado **es correcta**.
+Analicemos la reversibilidad del segundo argumento N, en el caso en que este no viene instanciado:
 
 - ### **N no está instanciada:**
 
@@ -62,27 +39,28 @@ Analicemos la reversibilidad del segundo argumento (N), en el caso en que este v
 
     Veamos entonces que en 
     ```prolog
-    length([X | T], N),
+    length(L, N)
     ```
-    estamos instanciando a N en todos los valores enteros posibles ¿por qué? porque el predicado length/2 es reversible en su segundo argumento, el cual -si no viene instanciado- instancia en él todos los valores posibles enteros tales que la lista del primer argumento tenga la longitud del segundo argumento. Luego de esta forma logramos una correcta instanciación de N, seguidamente podemos realizar todas las operaciones y asignaciones que deseemos haciendo uso del N instanciado como en el ítem anterior. Notemos que para cada instanciación de N haremos un llamado recursivo que podrá unificar con el caso del ítem anterior (el cuál ya verificamos que la definición es correcta y no falla).
+    estamos instanciando en N todos los valores enteros posibles ¿por qué? porque el predicado length/2 es reversible en sus dos argumentos.
+    <br>
+    <br>
+    Cuando ninguno de los argumentos están instanciados, se empiezan a generar soluciones y Prolog entra en un modo de enumeración infinita unificando L con N con todas las posibles longitudes de lista, empezando por 0.
 
-    Es prudente comentar que si nuestra definción de replicar/3 fuera la siguiente:
-
+    Podemos pensar la definicion de length de la siguiente manera:
     ```prolog
-    replicar(_, 0, []).  
-    replicar(X, N, [X | T]) :- 
-        N > 0,              %
-        length([X | T], N), % hicimos swap entre estos dos literales.
-        M is N-1,
-        replicar(X, M, T).
+    length([], 0).
+    length([_|T], N) :-
+        length(T, N0),
+        N is N0 + 1.
     ```
-    entonces nuestra definición de replicar/3 no sería reversible porque fallaría al intentar validar
-    ```prolog
-    N > 0,
-    ```
-    pues N no estaría instanciado y el motor aritmético de prolog no podría realizar la operacion correctamente y devolvería una falla.
 
-    Finalmente, al instanciar en N un valor y realizar los llamados recursivos, se instanciará en el tercer argumento de replicar/3 la lista de tamaño N donde cada elemento es Elem; y de este modo para cada valor de N entero mayor a cero posible (N perteneciente a: el conjunto de los números naturales unión con el conjunto que contiene como único elemento al número cero).
+    Por lo tanto, Prolog primero va a entrar en el primer caso e instanciar L en la lista vacía y N en 0. 
+    <br>
+    Al pedirle la siguiente solución va a entrar en el segundo caso. Al entrar en el segundo caso unifica L con una lista que contiene por lo menos un elemento **[ _ | T ]**, y hace el llamado recursivo, que en este caso va a caer en el caso base y T va a unificar con la lista vacía y N0 con 0. De esta manera el siguiente resultado será N = 1, y L la lista de un elemento con una variable sin instanciar.
+    <br><br>
+    Mientras sigamos pidiendo soluciones este proceso se va repitiendo agregando un nivel más de recursión en cada solución. De esta manera N se va incrementando en 1, y el tamaño de la lista también en 1 agregando una variable sin instanciar.
+
+    Volviendo al predicado replicar, ya vimos que con L y N sin instanciar, length empieza a generar listas de tamaño creciente empezando desde cero, con variables sin instanciar en sus elementos. Luego se ejecuta el maplist, y a cada variable sin instanciar se le asigna el valor Elem que si esta instanciado.
 
     #### Conclusión 1: la definición de replicar/3 para N no instanciada **no falla**.
 
