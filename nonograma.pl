@@ -34,39 +34,6 @@ zipR([], [], []).
 zipR([R|RT], [L|LT], [r(R,L)|T]) :- zipR(RT, LT, T).
 
 % Ejercicio 4
-
-% Caso Base: No hay celdas para pintar, se completan indefectiblemente con 'o'
-% Caso recursivo con una única resitrccion: Se diferencia del segundo caso recursivo en que no hay que obligatoriamente completar con una 'o' al final.
-% Caso recursivo con mas de una restricción: Se asigna una 'o' luego de cada bloque de pintadas para separar y hacer el backtracking luego. 
-% Con el length de la cola mayor a 0 aseguramos mas de una restricción.
-
-% APPROACH 1
-% pintadasValidas(r([], L)) :- length(L, N), replicar(o, N, L).
-% pintadasValidas(r([H], L)) :- length(L, N),
-% 								N >= H,
-% 								replicar(x, H, Pintadas),								 
-% 								K is N - H,
-% 								between(0, K, U), 
-% 								V is K - U,
-% 								replicar(o, U, Anterior),
-% 								replicar(o, V, Posterior),	
-% 								append(Anterior, Pintadas, L1),
-% 								append(L1, Posterior, L).
-% pintadasValidas(r([H | T], L)) :- length(L, N), length(T, Y), Y > 0,
-% 										N >= H + 1,
-% 										replicar(x, H, Pintadas),
-% 										append(Pintadas, [o], Medio),
-% 										K is N - H - 1, 
-% 										between(0, K, U), 
-% 										replicar(o, U, Anterior),
-% 										append(Anterior, Medio, L1),									
-% 										V is K - U, 
-% 										length(Posterior, V), 
-% 										pintadasValidas(r(T, Posterior)),
-% 										append(L1, Posterior, L).	
-% APPROACH 1
-
-% APPROACH PRIME
 pintadasValidas(r(Restricciones, L)) :- resolver(Restricciones, L).
 
 resolver([], L) :- dejarVacio(L).
@@ -84,31 +51,6 @@ agregarSinPintar([R|Rs], [o|Resto]) :- resolver([R|Rs], Resto).
 
 dejarVacio([]).
 dejarVacio([o|T]) :- dejarVacio(T).
-% APPROACH PRIME
-
-% APPROACH 2
-pintadasValidas(r([], L)) :- dejarVacio(L).
-pintadasValidas(r([R|RS], L)) :-
-	length(L, N),
-	between(0, N, Y),
-	pintadasRec(r([R|RS], L), Y).
-
-pintadasRec(r([], L), _) :- dejarVacio(L).
-pintadasRec(r([R], L), SP) :- pintarRestriccion(R, L, SP, Ultimas), pintadasRec(r([], Ultimas), _).
-pintadasRec(r([R|[RH|RT]], L), SP) :- pintarRestriccion(R, L, SP, Ultimas), 
-	length(Ultimas, Resto), 
-	between(1, Resto, Y),
-	pintadasRec(r([RH|RT], Ultimas), Y).
-
-pintarRestriccion(R, L, SP, Ultimas) :-
-	length(L, N), R =< N,
-	replicar(o, SP, NoPintadas),
-	replicar(x, R, Pintadas),
-	append(NoPintadas, Pintadas, Primeras),
-	append(Primeras, Ultimas, L).
-
-dejarVacio(L) :- length(L, N), replicar(o, N, L).
-% APPROACH 2
 
 % Ejercicio 5 
 resolverNaive(nono(_, RSS)) :- maplist(pintadasValidas, RSS).
@@ -169,7 +111,7 @@ resolverDeduciendo(NN) :- deducirVariasPasadas(NN), resolverDeduciendoRec(NN).
 
 resolverDeduciendoRec(NN) :- esSolucion(NN).
 resolverDeduciendoRec(NN) :- not(esSolucion(NN)),
-								restriccionConMenosLibres(NN, R), ! ,
+								restriccionConMenosLibres(NN, R), !,
 								pintadasValidas(R),
 								resolverDeduciendo(NN).
 
